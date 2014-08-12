@@ -46,10 +46,11 @@ for i in crops:
         cropped1 = not cropped1
     else:
         try:
-            datafile.write(splitdata[0] + ", " + i +"\n")
+            #split(".")[0] removes everthing after the . thus leaving only the date-time
+            datafile.write(splitdata[0] + ", " + i.split(".")[0] +"\n")
         except IndexError:
-            datafile.write("something wrong in " + i +"\n")
-            print "something wrong in " + i +"\n"
+            datafile.write("something wrong in " + i.split(".")[0] +"\n")
+            print "something wrong in " + i.split(".")[0] +"\n"
         cropped1 = not cropped1
     #cleanup
     remove(i)

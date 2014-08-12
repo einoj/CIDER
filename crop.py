@@ -1,5 +1,6 @@
 from PIL import Image
-from os import listdir
+from os import listdir, remove
+from subprocess import check_output, call
 
 def get_images():
     files = listdir('.')
@@ -34,6 +35,23 @@ for i in images:
     area.save(i+'.cropped2.ppm','ppm')
     crops.append(i+'.cropped2.ppm')
 
-from subprocess import call
+cropped1 = True
+datafile = open("data.csv", "w")
 for i in crops:
-    call(["gocr", i])
+    data = (check_output(["gocr", i]))
+    splitdata = data.split()
+    if cropped1:
+        for j in splitdata: 
+            datafile.write(j+", ")
+        cropped1 = not cropped1
+    else:
+        try:
+            datafile.write(splitdata[0]+ i +"\n")
+        except IndexError:
+            datafile.write("something wrong in " + i +"\n")
+            print "something wrong in " + i +"\n"
+        cropped1 = not cropped1
+    #cleanup
+    remove(i)
+
+datafile.close()

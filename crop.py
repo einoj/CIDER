@@ -46,7 +46,7 @@ for i in crops:
         cropped1 = not cropped1
     else:
         try:
-            datafile.write(splitdata[0]+ i +"\n")
+            datafile.write(splitdata[0] + ", " + i +"\n")
         except IndexError:
             datafile.write("something wrong in " + i +"\n")
             print "something wrong in " + i +"\n"

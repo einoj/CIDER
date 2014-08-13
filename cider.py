@@ -38,7 +38,9 @@ for i in images:
 cropped1 = True
 datafile = open("data.csv", "w")
 for i in crops:
-    data = (check_output(["gocr", i]))
+    #-C "0123456789" tells gocr that the images contains only numbers
+    #This is needed because it would read 0 as O
+    data = (check_output(["gocr", "-C", "0123456789", i]))
     splitdata = data.split()
     if cropped1:
         for j in splitdata: 

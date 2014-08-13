@@ -16,7 +16,7 @@ images = get_images()
 
 crops = []
 for i in images:
-    #This selection is of 8 data values in the image
+    #This selection is of 4 data values in the image
     #The 2 scintilators and 2 copies of the coincidence
     img = Image.open(i)
     SCINT_top = 187

@@ -2,6 +2,8 @@ from PIL import Image
 from os import listdir, remove
 from subprocess import check_output, call
 
+
+#find all .png files in working directory
 def get_images():
     files = listdir('.')
     images = []
@@ -14,6 +16,8 @@ images = get_images()
 
 crops = []
 for i in images:
+    #This selection is of 8 data values in the image
+    #The 2 scintilators and 2 copies of the coincidence
     img = Image.open(i)
     SCINT_top = 187
     SCINT_left = 409
@@ -22,14 +26,18 @@ for i in images:
     box = (SCINT_left, SCINT_top, SCINT_right, SCINT_bottom)
     area = img.crop(box)
     area.save(i+'.cropped.ppm','ppm')
+    #crop the area
     crops.append(i+'.cropped.ppm')
 
+    #The area in the image that contains the
+    #XION data
     IFC_NIM_top = 446
     IFC_NIM_left = 746
     IFC_NIM_bottom = 460
     IFC_NIM_right = 844
 
     box = (IFC_NIM_left, IFC_NIM_top, IFC_NIM_right, IFC_NIM_bottom)
+    #crop the area
     area = img.crop(box)
 
     area.save(i+'.cropped2.ppm','ppm')

@@ -16,6 +16,7 @@ def get_images():
 images = get_images()
 
 crops = []
+print "Cropping images..."
 for i in images:
     #Define a box by specifying the top left pixel and bottom left pixel
     #This selection is of 4 data values in the image
@@ -49,6 +50,7 @@ for i in images:
 # the first data contains 4, therefore cropped1 is initialized to True
 cropped1 = True
 datafile = open("data.csv", "w")
+print "Extracting data from images..."
 for i in crops:
     #-C "0123456789" tells gocr that the images contains only numbers
     #This is needed because it would read 0 as O
@@ -70,3 +72,4 @@ for i in crops:
     remove(i)
 
 datafile.close()
+print "Done!"

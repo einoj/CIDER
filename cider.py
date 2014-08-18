@@ -5,10 +5,11 @@ from subprocess import check_output, call
 
 #find all .png files in working directory
 def get_images():
-    files = listdir('.')
+    files = listdir('./dataimages')
     images = []
     for f in files:
         if ".png" in f:
+            f = "./dataimages/"+f
             images.append(f)
     return images
 
@@ -16,6 +17,7 @@ images = get_images()
 
 crops = []
 for i in images:
+    #Define a box by specifying the top left pixel and bottom left pixel
     #This selection is of 4 data values in the image
     #The 2 scintilators and 2 copies of the coincidence
     img = Image.open(i)
@@ -43,6 +45,8 @@ for i in images:
     area.save(i+'.cropped2.ppm','ppm')
     crops.append(i+'.cropped2.ppm')
 
+# boolean to tell if data conains 4 data points or the single xion data point
+# the first data contains 4, therefore cropped1 is initialized to True
 cropped1 = True
 datafile = open("data.csv", "w")
 for i in crops:

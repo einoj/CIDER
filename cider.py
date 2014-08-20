@@ -1,11 +1,22 @@
 from PIL import Image
 from os import listdir, remove
 from subprocess import check_output, call
+from guiselection import SelectImage
+from sys import argv
 
+if len(argv) != 2:
+    print "This program takes one argument. An integer of how many boxes of data should be taken from the image."
+    print "Ex. \"python cider.py 4\""
+    exit()
+try:
+    num_boxes = int(argv[1])
+except ValueError:
+    print argv[1] + " is not an integer!"
+    exit()
 
-#find all .png files in working directory
+#find all .png files in dataimages directory
 def get_images():
-    files = listdir('./dataimages')
+    files = listdir("./dataimages")
     images = []
     for f in files:
         if ".png" in f:
@@ -13,61 +24,50 @@ def get_images():
             images.append(f)
     return images
 
+# get the bounds of the data to be extracted from the images
+# this opens up the first image and lets the user select an area with their mouse
+def get_crop_boxes(num_boxes, image):
+    boxes = []
+    for i in range(num_boxes):
+        s = SelectImage(image)
+        area = s.cropSelection()
+        boxes.append(area)
+    return boxes
+
+
+def crop_images(images, boxes):
+    print "Cropping images..."
+    crops = []
+    for i in images:
+        # int included in filename to differentieate between the num_boxes
+        boxnum = 0
+        for box in boxes:
+            #open image to be cropped using PIL
+            img = Image.open(i)
+            #crop the area
+            area = img.crop(box)
+            area.save(i+".cropped"+str(boxnum)+".ppm","ppm")
+            crops.append(i+".cropped"+str(boxnum)+".ppm")
+            boxnum += 1
+    return crops
+
 images = get_images()
-
-crops = []
-print "Cropping images..."
-for i in images:
-    #Define a box by specifying the top left pixel and bottom left pixel
-    #This selection is of 4 data values in the image
-    #The 2 scintilators and 2 copies of the coincidence
-    img = Image.open(i)
-    SCINT_top = 187
-    SCINT_left = 409
-    SCINT_bottom = 218
-    SCINT_right = 520
-    box = (SCINT_left, SCINT_top, SCINT_right, SCINT_bottom)
-    area = img.crop(box)
-    area.save(i+'.cropped.ppm','ppm')
-    #crop the area
-    crops.append(i+'.cropped.ppm')
-
-    #The area in the image that contains the
-    #XION data
-    IFC_NIM_top = 446
-    IFC_NIM_left = 746
-    IFC_NIM_bottom = 460
-    IFC_NIM_right = 844
-
-    box = (IFC_NIM_left, IFC_NIM_top, IFC_NIM_right, IFC_NIM_bottom)
-    #crop the area
-    area = img.crop(box)
-
-    area.save(i+'.cropped2.ppm','ppm')
-    crops.append(i+'.cropped2.ppm')
-
-# boolean to tell if data conains 4 data points or the single xion data point
-# the first data contains 4, therefore cropped1 is initialized to True
-cropped1 = True
+crop_boxes = get_crop_boxes(num_boxes, images[0])
+crops = crop_images(images, crop_boxes)
 datafile = open("data.csv", "w")
+counter = 0
+
 print "Extracting data from images..."
 for i in crops:
+    counter += 1
     #-C "0123456789" tells gocr that the images contains only numbers
     #This is needed because it would read 0 as O
     data = (check_output(["gocr", "-C", "0123456789", i]))
-    splitdata = data.split()
-    if cropped1:
-        for j in splitdata: 
-            datafile.write(j+", ")
-        cropped1 = not cropped1
-    else:
-        try:
-            #split(".")[0] removes everthing after the . thus leaving only the date-time
-            datafile.write(splitdata[0] + ", " + i.split(".")[0] +"\n")
-        except IndexError:
-            datafile.write("something wrong in " + i.split(".")[0] +"\n")
-            print "something wrong in " + i.split(".")[0] +"\n"
-        cropped1 = not cropped1
+    datafile.write(data.rstrip()+", ")
+    if counter == num_boxes:
+        #i is the file name, i.split(".")[1].split("/")[2] gets the date from the filename
+        datafile.write(i.split(".")[1].split("/")[2] + "\n")
+        counter = 0
     #cleanup
     remove(i)
 

@@ -11,3 +11,7 @@ The image extractor now displays the first of the many images you want to extrac
 It is opened #databoxes times, and each time you choose a different area from the image to 
 extract data from. This of course assumes that all the images have equal layout,
 that no windows have been moved.
+
+## Dependencies
+
+PIL, pygame, GOCR.

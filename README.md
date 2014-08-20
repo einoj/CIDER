@@ -14,4 +14,4 @@ that no windows have been moved.
 
 ## Dependencies
 
-PIL, pygame, GOCR.
+Python 2, PIL, pygame, GOCR.
